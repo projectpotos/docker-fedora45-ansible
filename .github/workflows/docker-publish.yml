@@ -1,0 +1,36 @@
+---
+name: docker-publish
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # Weekly rebuild so the image keeps up with upstream Fedora updates.
+    - cron: "25 2 * * 1"
+
+permissions: {}
+
+concurrency:
+  group: docker-publish-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    permissions:
+      contents: read
+      packages: write # push the image to GHCR
+      id-token: write # keyless signing for the provenance attestation
+      attestations: write # write the build-provenance attestation
+    uses: projectpotos/actions/.github/workflows/release-container.yaml@31a073ace13fa1f689fe54cd71754f0ecba6dfb6 # v0.5.0
+    with:
+      setup-qemu: true
+      # Single rolling tag, matching the upstream geerlingguy image:
+      # default branch -> :latest
+      tags: |
+        type=raw,value=latest,enable={{is_default_branch}}
+      labels: |
+        org.opencontainers.image.title=docker-fedora45-ansible
+        org.opencontainers.image.description=Fedora 45 container for Ansible playbook and role testing
+        org.opencontainers.image.licenses=MIT

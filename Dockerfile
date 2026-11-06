@@ -3,7 +3,7 @@ FROM docker.io/library/fedora:45@sha256:a7d72ba2745b100a3351087472e5ee7b2450af7c
 LABEL maintainer="Project Potos"
 
 ENV container="docker"
-ENV pip_packages="ansible"
+ENV pip_packages="ansible-core"
 
 RUN echo "max_parallel_downloads=20" >> /etc/dnf/dnf.conf
 
